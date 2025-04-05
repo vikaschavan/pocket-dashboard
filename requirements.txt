@@ -1,3 +1,4 @@
 pandas
 streamlit
 gdown
+st-aggrid
