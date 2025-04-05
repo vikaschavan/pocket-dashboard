@@ -7,7 +7,7 @@ st.set_page_config(page_title="Pocket Summary Dashboard", layout="wide")
 st.title("🔍 Pocket Summary Explorer")
 
 # 📥 Download CSV from Google Drive using gdown
-FILE_ID = "1-WuObYzPCvFMRc8E1fVg3XaGMZ1aQChp"  # Replace with your actual file ID
+#FILE_ID = "1-WuObYzPCvFMRc8E1fVg3XaGMZ1aQChp"  # Replace with your actual file ID
 CSV_FILE = "Pocket_Summaries.csv"
 
 # Download only once
@@ -15,7 +15,10 @@ if not os.path.exists(CSV_FILE):
     try:
         #subprocess.run(["pip", "install", "gdown"])
         import gdown
-        gdown.download(id=FILE_ID, output=CSV_FILE, quiet=False)
+       # gdown.download(id=FILE_ID, output=CSV_FILE, quiet=False)
+        FILE_ID = "1-WuObYzPCvFMRc8E1fVg3XaGMZ1aQChp"
+        gdown.download(f"https://drive.google.com/uc?id={FILE_ID}", output="Pocket_Summaries.csv", quiet=False)
+
     except Exception as e:
         st.error(f"❌ Failed to download CSV from Google Drive: {e}")
 
