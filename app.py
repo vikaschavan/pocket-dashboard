@@ -57,28 +57,39 @@ try:
         start_date, end_date = date_range
         filtered_df = filtered_df[(filtered_df["saved_at"].dt.date >= start_date) & (filtered_df["saved_at"].dt.date <= end_date)]
 
-    # Format URL as hyperlink (Streamlit markdown style)
-    filtered_df["🔗 URL"] = filtered_df["url"].apply(lambda x: f"[🔗 Link]({x})")
+    # Format URL as hyperlink text
+    filtered_df["🔗 URL"] = filtered_df["url"].apply(lambda x: f"[Link]({x})")
 
-    display_df = filtered_df[["title", "🔗 URL", "saved_at", "short_description", "tags", "summary"]].rename(
-        columns={
-            "title": "📖 Title",
-            "saved_at": "🕒 Saved At",
-            "short_description": "🧠 Short",
-            "tags": "🏷️ Tags",
-            "summary": "📝 Summary"
-        }
-    )
+    # Reorder columns
+    display_df = filtered_df[[
+        "title",
+        "🔗 URL",
+        "saved_at",
+        "short_description",
+        "tags",
+        "summary"
+    ]].rename(columns={
+        "title": "📖 Title",
+        "saved_at": "🕒 Saved At",
+        "short_description": "🧠 Short Description",
+        "tags": "🏷️ Tags",
+        "summary": "📝 Summary"
+    })
 
+    # Apply custom styling to improve readability
     st.markdown("""
         <style>
-            .dataframe td {
-                white-space: normal !important;
-                word-wrap: break-word !important;
-            }
-            .stDataFrame div {
-                white-space: normal !important;
-            }
+        .element-container:has(.dataframe) {
+            overflow-x: auto;
+        }
+        .dataframe td {
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            vertical-align: top;
+        }
+        .dataframe th {
+            text-align: left;
+        }
         </style>
     """, unsafe_allow_html=True)
 
