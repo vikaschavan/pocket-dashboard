@@ -57,7 +57,8 @@ try:
         start_date, end_date = date_range
         filtered_df = filtered_df[(filtered_df["saved_at"].dt.date >= start_date) & (filtered_df["saved_at"].dt.date <= end_date)]
 
-    filtered_df["url_link"] = filtered_df["url"].apply(lambda x: f"[🔗 Link]({x})")
+    # Format title and URL separately, with clickable URL
+    filtered_df["url_link"] = filtered_df["url"].apply(lambda x: f'<a href="{x}" target="_blank">🔗</a>')
 
     display_df = filtered_df[["title", "url_link", "saved_at", "short_description", "tags", "summary"]].rename(
         columns={
@@ -70,8 +71,25 @@ try:
         }
     )
 
+    # Custom style for word wrap
+    st.markdown("""
+        <style>
+            table {
+                table-layout: fixed;
+                width: 100%;
+                word-wrap: break-word;
+            }
+            th, td {
+                text-align: left;
+                vertical-align: top;
+                white-space: pre-wrap;
+                padding: 6px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.markdown(f"### 📄 Showing {len(display_df)} filtered articles")
-    st.dataframe(display_df, use_container_width=True)
+    st.write(display_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
 except FileNotFoundError:
     st.error("❌ CSV not found. Make sure it's shared publicly and FILE_ID is correct.")
