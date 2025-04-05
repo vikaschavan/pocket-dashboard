@@ -21,7 +21,6 @@ if not os.path.exists(CSV_FILE):
 try:
     df = pd.read_csv(CSV_FILE)
 
-    # ✅ Use mapped_tags properly
     df["mapped_tags"] = df["mapped_tags"].fillna("")
     df["tags_list"] = df["mapped_tags"].apply(lambda x: [tag.strip() for tag in x.split(",") if tag.strip()])
     all_tags = sorted(set(tag for tags in df["tags_list"] for tag in tags))
@@ -33,21 +32,7 @@ try:
     # Sidebar Filters
     with st.sidebar:
         st.header("📌 Filter by Tags")
-        if "selected_tags" not in st.session_state:
-            st.session_state.selected_tags = []
-
-        for tag in all_tags:
-            is_selected = tag in st.session_state.selected_tags
-            btn_style = "background-color:#1f77b4;color:white;border:none;padding:4px 10px;margin:2px;border-radius:20px;"
-            btn_style_unselected = "background-color:#f0f0f0;color:#333;border:none;padding:4px 10px;margin:2px;border-radius:20px;"
-
-            if st.button(tag, key=f"tag_{tag}", help="Click to toggle filter"):
-                if is_selected:
-                    st.session_state.selected_tags.remove(tag)
-                else:
-                    st.session_state.selected_tags.append(tag)
-
-        selected_tags = st.session_state.selected_tags
+        selected_tags = st.multiselect("Select tags", all_tags)
 
         st.markdown("---")
         st.header("🔍 Search")
