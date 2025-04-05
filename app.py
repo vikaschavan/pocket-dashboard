@@ -13,7 +13,7 @@ CSV_FILE = "Pocket_Summaries.csv"
 # Download only once
 if not os.path.exists(CSV_FILE):
     try:
-        subprocess.run(["pip", "install", "gdown"])
+        #subprocess.run(["pip", "install", "gdown"])
         import gdown
         gdown.download(id=FILE_ID, output=CSV_FILE, quiet=False)
     except Exception as e:
