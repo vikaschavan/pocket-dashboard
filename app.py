@@ -1,24 +1,20 @@
 import streamlit as st
 import pandas as pd
 import os
-import subprocess
+import gdown
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 st.set_page_config(page_title="Pocket Summary Dashboard", layout="wide")
 st.title("🔍 Pocket Summary Explorer")
 
 # 📥 Download CSV from Google Drive using gdown
-#FILE_ID = "1-WuObYzPCvFMRc8E1fVg3XaGMZ1aQChp"  # Replace with your actual file ID
+FILE_ID = "1-WuObYzPCvFMRc8E1fVg3XaGMZ1aQChp"
 CSV_FILE = "Pocket_Summaries.csv"
 
 # Download only once
 if not os.path.exists(CSV_FILE):
     try:
-        #subprocess.run(["pip", "install", "gdown"])
-        import gdown
-       # gdown.download(id=FILE_ID, output=CSV_FILE, quiet=False)
-        FILE_ID = "1-WuObYzPCvFMRc8E1fVg3XaGMZ1aQChp"
-        gdown.download(f"https://drive.google.com/uc?id={FILE_ID}", output="Pocket_Summaries.csv", quiet=False)
-
+        gdown.download(f"https://drive.google.com/uc?id={FILE_ID}", output=CSV_FILE, quiet=False)
     except Exception as e:
         st.error(f"❌ Failed to download CSV from Google Drive: {e}")
 
@@ -49,8 +45,24 @@ try:
             filtered_df["summary"].str.lower().str.contains(keyword)
         ]
 
-    st.markdown(f"### 📄 Showing {len(filtered_df)} filtered articles")
-    st.dataframe(filtered_df[["title", "saved_at", "short_description", "tags", "summary", "url"]], use_container_width=True)
+    # Format title as a link
+    filtered_df["title_link"] = filtered_df.apply(lambda row: f"[{row['title']}]({row['url']})", axis=1)
+    display_df = filtered_df[["title_link", "saved_at", "short_description", "tags", "summary"]].rename(
+        columns={
+            "title_link": "📖 Title",
+            "saved_at": "🕒 Saved At",
+            "short_description": "🧠 Short",
+            "tags": "🏷️ Tags",
+            "summary": "📝 Summary"
+        }
+    )
+
+    gb = GridOptionsBuilder.from_dataframe(display_df)
+    gb.configure_default_column(wrapText=True, autoHeight=True)
+    gb.configure_grid_options(domLayout='normal', rowHeight=100)
+
+    st.markdown(f"### 📄 Showing {len(display_df)} filtered articles")
+    AgGrid(display_df, gridOptions=gb.build(), height=800, fit_columns_on_grid_load=True)
 
 except FileNotFoundError:
     st.error("❌ CSV not found. Make sure it's shared publicly and FILE_ID is correct.")
