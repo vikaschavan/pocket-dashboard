@@ -7,8 +7,8 @@ st.set_page_config(page_title="Pocket Summary Dashboard", layout="wide")
 st.title("🔍 Pocket Summary Explorer")
 
 # 📥 Download CSV from Google Drive using gdown
-FILE_ID = "1-WuObYzPCvFMRc8E1fVg3XaGMZ1aQChp"
-CSV_FILE = "Pocket_Summaries.csv"
+FILE_ID = "1-hjohuE1HDj7UgB8KsSV_SlxoL7Ah88"
+CSV_FILE = "Pocket_Summaries_Tagged.csv"
 
 # Download only once
 if not os.path.exists(CSV_FILE):
@@ -21,8 +21,8 @@ if not os.path.exists(CSV_FILE):
 try:
     df = pd.read_csv(CSV_FILE)
 
-    df["tags"] = df["tags"].fillna("")
-    df["tags_list"] = df["tags"].apply(lambda x: [tag.strip() for tag in x.split(",") if tag.strip()])
+    df["mapped_tags"] = df["tags"].fillna("")
+    df["tags_list"] = df["mapped_tags"].apply(lambda x: [tag.strip() for tag in x.split(",") if tag.strip()])
     all_tags = sorted(set(tag for tags in df["tags_list"] for tag in tags))
 
     df["saved_at"] = pd.to_datetime(df["saved_at"])
@@ -72,7 +72,7 @@ try:
         "title": "📖 Title",
         "saved_at": "🕒 Saved At",
         "short_description": "🧠 Short",
-        "tags": "🏷️ Tags",
+        "mapped_tags": "🏷️ Tags",
         "summary": "📝 Summary"
     })
 
