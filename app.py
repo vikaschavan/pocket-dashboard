@@ -21,7 +21,8 @@ if not os.path.exists(CSV_FILE):
 try:
     df = pd.read_csv(CSV_FILE)
 
-    df["mapped_tags"] = df["tags"].fillna("")
+    # ✅ Use mapped_tags properly
+    df["mapped_tags"] = df["mapped_tags"].fillna("")
     df["tags_list"] = df["mapped_tags"].apply(lambda x: [tag.strip() for tag in x.split(",") if tag.strip()])
     all_tags = sorted(set(tag for tags in df["tags_list"] for tag in tags))
 
@@ -66,8 +67,9 @@ try:
     # 🔗 Make URL clickable
     filtered_df["🔗 URL"] = filtered_df["url"].apply(lambda x: f'<a href="{x}" target="_blank">Link</a>')
 
+    # ✅ Display mapped_tags properly
     display_df = filtered_df[[
-        "title", "🔗 URL", "saved_at", "short_description", "tags", "summary"
+        "title", "🔗 URL", "saved_at", "short_description", "mapped_tags", "summary"
     ]].rename(columns={
         "title": "📖 Title",
         "saved_at": "🕒 Saved At",
