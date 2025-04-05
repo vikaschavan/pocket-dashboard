@@ -55,43 +55,55 @@ try:
 
     if isinstance(date_range, tuple) and len(date_range) == 2:
         start_date, end_date = date_range
-        filtered_df = filtered_df[(filtered_df["saved_at"].dt.date >= start_date) & (filtered_df["saved_at"].dt.date <= end_date)]
+        filtered_df = filtered_df[
+            (filtered_df["saved_at"].dt.date >= start_date) &
+            (filtered_df["saved_at"].dt.date <= end_date)
+        ]
 
-    # Format URL as markdown-style hyperlink
-    filtered_df["🔗 URL"] = filtered_df["url"].apply(lambda x: f"[Link]({x})")
+    # 🔃 Sort by most recent first
+    filtered_df = filtered_df.sort_values(by="saved_at", ascending=False)
 
-    # Reorder and rename columns
+    # 🔗 Make URL clickable
+    filtered_df["🔗 URL"] = filtered_df["url"].apply(lambda x: f'<a href="{x}" target="_blank">Link</a>')
+
     display_df = filtered_df[[
-        "title",
-        "🔗 URL",
-        "saved_at",
-        "short_description",
-        "tags",
-        "summary"
+        "title", "🔗 URL", "saved_at", "short_description", "tags", "summary"
     ]].rename(columns={
         "title": "📖 Title",
         "saved_at": "🕒 Saved At",
-        "short_description": "🧠 Short Description",
+        "short_description": "🧠 Short",
         "tags": "🏷️ Tags",
         "summary": "📝 Summary"
     })
 
-    # 📄 Show a nicely formatted markdown table with word wrap
+    # 🪄 Word wrap styling
+    st.markdown("""
+        <style>
+            table {
+                table-layout: fixed;
+                width: 100%;
+                word-wrap: break-word;
+                border-collapse: collapse;
+            }
+            th, td {
+                text-align: left;
+                vertical-align: top;
+                padding: 8px;
+                white-space: pre-wrap;
+            }
+            th {
+                background-color: #444;
+                color: white;
+            }
+            td a {
+                color: #1f77b4;
+                text-decoration: none;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.markdown(f"### 📄 Showing {len(display_df)} filtered articles")
-
-    def render_markdown_table(df):
-        for _, row in df.iterrows():
-            st.markdown(f"""
-**📖 {row['📖 Title']}**  
-{row['🔗 URL']}  
-🕒 *{row['🕒 Saved At'].strftime('%Y-%m-%d')}*  
-🏷️ *{row['🏷️ Tags']}*  
-🧠 *{row['🧠 Short Description']}*  
-📝 {row['📝 Summary']}  
----
-""")
-
-    render_markdown_table(display_df)
+    st.markdown(display_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
 except FileNotFoundError:
     st.error("❌ CSV not found. Make sure it's shared publicly and FILE_ID is correct.")
