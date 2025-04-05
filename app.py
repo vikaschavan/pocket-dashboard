@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 import gdown
-from st_aggrid import AgGrid, GridOptionsBuilder
 
 st.set_page_config(page_title="Pocket Summary Dashboard", layout="wide")
 st.title("🔍 Pocket Summary Explorer")
@@ -45,8 +44,13 @@ try:
             filtered_df["summary"].str.lower().str.contains(keyword)
         ]
 
-    # Format title as a link
-    filtered_df["title_link"] = filtered_df.apply(lambda row: f"[{row['title']}]({row['url']})", axis=1)
+    st.markdown(f"### 📄 Showing {len(filtered_df)} filtered articles")
+
+    # Make title clickable
+    filtered_df["title_link"] = filtered_df.apply(
+        lambda row: f"[{row['title']}]({row['url']})", axis=1
+    )
+
     display_df = filtered_df[["title_link", "saved_at", "short_description", "tags", "summary"]].rename(
         columns={
             "title_link": "📖 Title",
@@ -57,12 +61,24 @@ try:
         }
     )
 
-    gb = GridOptionsBuilder.from_dataframe(display_df)
-    gb.configure_default_column(wrapText=True, autoHeight=True)
-    gb.configure_grid_options(domLayout='normal', rowHeight=100)
+    def render_table(df):
+        st.markdown("""
+            <style>
+                table {
+                    table-layout: fixed;
+                    width: 100%;
+                    word-wrap: break-word;
+                    white-space: normal;
+                    font-size: 14px;
+                }
+                td {
+                    vertical-align: top;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+        st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
-    st.markdown(f"### 📄 Showing {len(display_df)} filtered articles")
-    AgGrid(display_df, gridOptions=gb.build(), height=800, fit_columns_on_grid_load=True)
+    render_table(display_df)
 
 except FileNotFoundError:
     st.error("❌ CSV not found. Make sure it's shared publicly and FILE_ID is correct.")
