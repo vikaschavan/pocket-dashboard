@@ -7,8 +7,8 @@ st.set_page_config(page_title="Pocket Summary Dashboard", layout="wide")
 st.title("🔍 Pocket Summary Explorer")
 
 # 📥 Download CSV from Google Drive using gdown
-FILE_ID = "YOUR_FILE_ID"  # Replace with your actual file ID
-CSV_FILE = "pocket_summary_output.csv"
+FILE_ID = "WuObYzPCvFMRc8E1fVg3XaGMZ1aQChp"  # Replace with your actual file ID
+CSV_FILE = "Pocket_Summaries.csv"
 
 # Download only once
 if not os.path.exists(CSV_FILE):
