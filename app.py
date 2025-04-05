@@ -57,10 +57,10 @@ try:
         start_date, end_date = date_range
         filtered_df = filtered_df[(filtered_df["saved_at"].dt.date >= start_date) & (filtered_df["saved_at"].dt.date <= end_date)]
 
-    # Format URL as hyperlink text
+    # Format URL as markdown-style hyperlink
     filtered_df["🔗 URL"] = filtered_df["url"].apply(lambda x: f"[Link]({x})")
 
-    # Reorder columns
+    # Reorder and rename columns
     display_df = filtered_df[[
         "title",
         "🔗 URL",
@@ -76,25 +76,22 @@ try:
         "summary": "📝 Summary"
     })
 
-    # Apply custom styling to improve readability
-    st.markdown("""
-        <style>
-        .element-container:has(.dataframe) {
-            overflow-x: auto;
-        }
-        .dataframe td {
-            white-space: pre-wrap !important;
-            word-wrap: break-word !important;
-            vertical-align: top;
-        }
-        .dataframe th {
-            text-align: left;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
+    # 📄 Show a nicely formatted markdown table with word wrap
     st.markdown(f"### 📄 Showing {len(display_df)} filtered articles")
-    st.dataframe(display_df, use_container_width=True)
+
+    def render_markdown_table(df):
+        for _, row in df.iterrows():
+            st.markdown(f"""
+**📖 {row['📖 Title']}**  
+{row['🔗 URL']}  
+🕒 *{row['🕒 Saved At'].strftime('%Y-%m-%d')}*  
+🏷️ *{row['🏷️ Tags']}*  
+🧠 *{row['🧠 Short Description']}*  
+📝 {row['📝 Summary']}  
+---
+""")
+
+    render_markdown_table(display_df)
 
 except FileNotFoundError:
     st.error("❌ CSV not found. Make sure it's shared publicly and FILE_ID is correct.")
